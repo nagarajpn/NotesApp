@@ -38,7 +38,7 @@ public class MainActivity extends ActionBarActivity{
 		if (LIST_LENGTH > 0){
 			setContentView(R.layout.main_activity);
 			final ListView listview = (ListView) findViewById(R.id.listview);
-			Note[] items = new Note[LIST_LENGTH];
+			final Note[] items = new Note[LIST_LENGTH];
 		
 			getList(items);
 			final ArrayAdapter adapter = new ArrayAdapter(this,R.layout.list,items);
@@ -47,7 +47,13 @@ public class MainActivity extends ActionBarActivity{
 			listview.setOnItemClickListener(new AdapterView.OnItemClickListener(){
 				public void onItemClick(AdapterView<?> parent, View view,
 						int position, long id) {
+					//final String title = (final) items[position-1].getTitle();
+					//final String id = items[position-1].getId();
 					//Toast.makeText(getApplicationContext(),((TextView) view).getText(), Toast.LENGTH_SHORT).show();
+					Intent i = new Intent(MainActivity.this, DisplayActivity.class);
+					i.putExtra("TITLE", items[position].getTitle());
+					i.putExtra("FILENAME", items[position].getId());
+					startActivity(i);
 				}
 			});
 		}

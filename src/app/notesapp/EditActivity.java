@@ -110,9 +110,8 @@ public class EditActivity extends ActionBarActivity {
 		editor.putInt("FILE_INDEX", index);
 		editor.putInt("TOTAL_ITEMS",sp.getInt("TOTAL_ITEMS", 0)+1);
 		editor.commit();
-		Toast.makeText(getApplicationContext(),Integer.toString(sp.getInt("TOTAL_ITEMS", 0)), Toast.LENGTH_SHORT).show();
+		//Toast.makeText(getApplicationContext(),Integer.toString(sp.getInt("TOTAL_ITEMS", 0)), Toast.LENGTH_SHORT).show();
 		Intent intent = new Intent(this, MainActivity.class);
-		intent.putExtra("ID", FILENAME);
 		startActivity(intent);
 	}
 }
