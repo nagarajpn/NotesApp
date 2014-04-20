@@ -29,8 +29,8 @@
             android:theme="@style/Theme.AppCompat.Light" />
         <activity
             android:name="app.notesapp.DisplayActivity"
-            android:label="@string/title_activity_display" >
-        </activity>
+            android:label="@string/title_activity_display"
+            android:theme="@style/Theme.AppCompat.Light" />
     </application>
 
 </manifest>

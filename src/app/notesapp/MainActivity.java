@@ -86,6 +86,7 @@ public class MainActivity extends ActionBarActivity{
 	
 	public void openEditActivity(){
 		Intent intent = new Intent(this, EditActivity.class);
+		intent.putExtra("CALLING_ACTIVITY",ActivityConstants.MAIN_ACTIVITY);
 		startActivity(intent);
 	}
 	

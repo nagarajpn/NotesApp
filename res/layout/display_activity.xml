@@ -18,6 +18,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="0.91"
         android:text="TextView"
+        android:maxLines="10"
         android:textSize="@dimen/abc_action_bar_subtitle_text_size" />
 
 </LinearLayout>

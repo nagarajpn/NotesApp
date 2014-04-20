@@ -1,10 +1,12 @@
 package app.notesapp;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -24,13 +26,48 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class EditActivity extends ActionBarActivity {
-	
+	boolean fromDisplayActivity = false;
+	private String title;
+	private String id;
 	
 	public void onCreate(Bundle savedBundleInstance){
 		super.onCreate(savedBundleInstance);
-		setContentView(R.layout.edit_activity);		
+		setContentView(R.layout.edit_activity);
 		
+		EditText titleView = (EditText) findViewById(R.id.editText1);
+		EditText contentsView = (EditText) findViewById(R.id.editText2);
 		
+		Intent i = getIntent();
+		if(i.getIntExtra("CALLING_ACTIVITY", 0) == ActivityConstants.DISPLAY_ACTIVITY){
+			fromDisplayActivity = true;
+			setTitle(i.getStringExtra("TITLE"));
+			titleView.setText(title);
+			
+			setId(i.getStringExtra("FILENAME"));
+		
+			BufferedReader reader = null;
+			String eol = System.getProperty("line.separator");
+			
+			try{
+				reader = new BufferedReader(new InputStreamReader(openFileInput(id)));
+				StringBuffer acc_note = new StringBuffer();
+				String temp = null;
+				while((temp = reader.readLine()) != null){
+					acc_note.append(temp+eol);	
+				}
+			    contentsView.setText(acc_note);
+			}catch(IOException e){
+				e.printStackTrace();
+			}finally{
+				if (reader!=null){
+					try{
+						reader.close();
+					}catch(Exception e){
+						e.printStackTrace();
+					}
+				}
+			}
+		}
 	}
 	public boolean onCreateOptionsMenu(Menu menu) {
 	    // Inflate the menu items for use in the action bar
@@ -44,7 +81,13 @@ public class EditActivity extends ActionBarActivity {
 	    // Handle presses on the action bar items
 	    switch (item.getItemId()) {
 	        case R.id.save_note:
-	            saveNewNote();
+	        	if(fromDisplayActivity == true){
+	        		saveNote();
+	        		fromDisplayActivity = false;
+	        	}
+	        	else{
+	        		saveNewNote();
+	        	}
 	            return true;
 	        default:
 	            return super.onOptionsItemSelected(item);
@@ -113,5 +156,78 @@ public class EditActivity extends ActionBarActivity {
 		//Toast.makeText(getApplicationContext(),Integer.toString(sp.getInt("TOTAL_ITEMS", 0)), Toast.LENGTH_SHORT).show();
 		Intent intent = new Intent(this, MainActivity.class);
 		startActivity(intent);
+	}
+	
+	private void saveNote(){
+		EditText title = (EditText) findViewById(R.id.editText1);
+		EditText contents = (EditText) findViewById(R.id.editText2);
+		
+		BufferedReader reader = null;
+		String eol = System.getProperty("line.separator");
+		StringBuffer acc_note = new StringBuffer();
+		
+		try{
+			reader = new BufferedReader(new InputStreamReader(openFileInput("NOTES_LIST")));
+			String temp = null;
+			while((temp = reader.readLine()) != null){
+				acc_note.append(temp+eol);	
+			}
+		}catch(IOException e){
+			e.printStackTrace();
+		}finally{
+			if (reader!=null){
+				try{
+					reader.close();
+				}catch(Exception e){
+					e.printStackTrace();
+				}
+			}
+		}
+		String temp1 = acc_note.substring(0,acc_note.indexOf(id)+id.length()+1);
+		String temp2 = acc_note.substring(acc_note.indexOf(id)+id.length()+1);
+		temp2 = temp2.substring(temp2.indexOf(eol));
+		
+		BufferedWriter writer=null;
+		
+		try{
+			writer = new BufferedWriter(new OutputStreamWriter(openFileOutput("NOTES_LIST",Context.MODE_PRIVATE)));
+		    
+		}catch(IOException e){
+
+			e.printStackTrace();
+		}finally{
+			if (writer!=null){
+				try{
+				    writer.write(temp1 + title.getText().toString() + temp2);
+					writer.close();
+				}catch(Exception e){
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		try{
+			writer = new BufferedWriter(new OutputStreamWriter(openFileOutput(id,Context.MODE_PRIVATE)));
+		    writer.write(contents.getText().toString() + eol);
+		}catch(IOException e){
+			e.printStackTrace();
+		}finally{
+			if (writer!=null){
+				try{
+					writer.close();
+				}catch(Exception e){
+					e.printStackTrace();
+				}
+			}
+		}
+		Intent intent = new Intent(this, MainActivity.class);
+		startActivity(intent);
+	}
+	private void setTitle(String title){
+		this.title = title;
+	}
+	
+	private void setId(String id){
+		this.id = id;
 	}
 }

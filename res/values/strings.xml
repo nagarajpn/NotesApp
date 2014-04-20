@@ -3,6 +3,8 @@
 
     <string name="app_name">NotesApp</string>
     <string name="new_note">New Note</string>
+    <string name="save_note">Save Note</string>
+    <string name="edit_note">Edit Note</string>
     <string name="title_activity_display">DisplayActivity</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
