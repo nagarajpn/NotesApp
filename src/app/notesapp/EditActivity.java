@@ -89,6 +89,15 @@ public class EditActivity extends ActionBarActivity {
 	        		saveNewNote();
 	        	}
 	            return true;
+	        case R.id.delete_note_from_edit:
+	        	if(fromDisplayActivity == true){
+	        		deleteNote();
+	        		fromDisplayActivity = false;
+	        	}
+	        	else{
+	        		Intent i = new Intent(this, MainActivity.class);
+	        		startActivity(i);
+	        	}
 	        default:
 	            return super.onOptionsItemSelected(item);
 	    }
@@ -222,6 +231,61 @@ public class EditActivity extends ActionBarActivity {
 		}
 		Intent intent = new Intent(this, MainActivity.class);
 		startActivity(intent);
+	}
+	
+	private void deleteNote(){
+		Context c = this;
+		c.deleteFile(id);
+		
+		BufferedReader reader = null;
+		String eol = System.getProperty("line.separator");
+		StringBuffer acc_note = new StringBuffer();
+		
+		try{
+			reader = new BufferedReader(new InputStreamReader(openFileInput("NOTES_LIST")));
+			String temp = null;
+			while((temp = reader.readLine()) != null){
+				acc_note.append(temp+eol);	
+			}
+		}catch(IOException e){
+			e.printStackTrace();
+		}finally{
+			if (reader!=null){
+				try{
+					reader.close();
+				}catch(Exception e){
+					e.printStackTrace();
+				}
+			}
+		}
+		String temp1 = acc_note.substring(0,acc_note.indexOf(id));
+		String temp2 = acc_note.substring(acc_note.indexOf(id)+id.length()+1);
+		temp2 = temp2.substring(temp2.indexOf(eol)+1);
+		
+		BufferedWriter writer=null;
+		
+		try{
+			writer = new BufferedWriter(new OutputStreamWriter(openFileOutput("NOTES_LIST",Context.MODE_PRIVATE)));
+		    
+		}catch(IOException e){
+
+			e.printStackTrace();
+		}finally{
+			if (writer!=null){
+				try{
+				    writer.write(temp1 + temp2);
+					writer.close();
+				}catch(Exception e){
+					e.printStackTrace();
+				}
+			}
+		}
+		SharedPreferences sp = getSharedPreferences("MAIN_LIST",0);
+		SharedPreferences.Editor editor = sp.edit();
+		editor.putInt("TOTAL_ITEMS",sp.getInt("TOTAL_ITEMS", 0)-1);
+		editor.commit();
+		Intent i = new Intent(this,MainActivity.class);
+		startActivity(i);
 	}
 	private void setTitle(String title){
 		this.title = title;

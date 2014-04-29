@@ -9,6 +9,7 @@ import java.io.OutputStreamWriter;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
@@ -80,6 +81,9 @@ public class DisplayActivity extends ActionBarActivity {
 	        case R.id.edit_note:
 	            openEditActivity();
 	            return true;
+	        case R.id.delete_note_from_display:
+	        	deleteNote();
+	        	return true;
 	        default:
 	            return super.onOptionsItemSelected(item);
 	    }
@@ -90,6 +94,61 @@ public class DisplayActivity extends ActionBarActivity {
 		i.putExtra("TITLE", title);
 		i.putExtra("FILENAME", id);
 		i.putExtra("CALLING_ACTIVITY",ActivityConstants.DISPLAY_ACTIVITY);
+		startActivity(i);
+	}
+	
+	private void deleteNote(){
+		Context c = this;
+		c.deleteFile(id);
+		
+		BufferedReader reader = null;
+		String eol = System.getProperty("line.separator");
+		StringBuffer acc_note = new StringBuffer();
+		
+		try{
+			reader = new BufferedReader(new InputStreamReader(openFileInput("NOTES_LIST")));
+			String temp = null;
+			while((temp = reader.readLine()) != null){
+				acc_note.append(temp+eol);	
+			}
+		}catch(IOException e){
+			e.printStackTrace();
+		}finally{
+			if (reader!=null){
+				try{
+					reader.close();
+				}catch(Exception e){
+					e.printStackTrace();
+				}
+			}
+		}
+		String temp1 = acc_note.substring(0,acc_note.indexOf(id));
+		String temp2 = acc_note.substring(acc_note.indexOf(id)+id.length()+1);
+		temp2 = temp2.substring(temp2.indexOf(eol)+1);
+		
+		BufferedWriter writer=null;
+		
+		try{
+			writer = new BufferedWriter(new OutputStreamWriter(openFileOutput("NOTES_LIST",Context.MODE_PRIVATE)));
+		    
+		}catch(IOException e){
+
+			e.printStackTrace();
+		}finally{
+			if (writer!=null){
+				try{
+				    writer.write(temp1 + temp2);
+					writer.close();
+				}catch(Exception e){
+					e.printStackTrace();
+				}
+			}
+		}
+		SharedPreferences sp = getSharedPreferences("MAIN_LIST",0);
+		SharedPreferences.Editor editor = sp.edit();
+		editor.putInt("TOTAL_ITEMS",sp.getInt("TOTAL_ITEMS", 0)-1);
+		editor.commit();
+		Intent i = new Intent(this,MainActivity.class);
 		startActivity(i);
 	}
 }
